@@ -123,6 +123,6 @@ npm run preview
 
 ### Links
 
-- Live (frontend) :
-- Live (backend) :
+- Live (frontend) : https://todo-board.netlify.app/
+- Live (backend) : https://todo-board-im99.onrender.com/
 - Demo Video :
