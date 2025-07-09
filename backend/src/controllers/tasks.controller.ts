@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { APIResponse } from "../utils/APIResponse.js";
 import mongoose from "mongoose";
 import Task from "../models/tasks.js";
+import { addLog } from "../models/logs.js";
 
 export const getAllTasks = async (req: Request, res: Response) => {
   try {
@@ -23,6 +24,8 @@ export const getAllTasks = async (req: Request, res: Response) => {
       limit: limitNum,
       hasMore,
     };
+
+    addLog("getAllTasks", req.user_id);
 
     res
       .status(200)
@@ -46,6 +49,8 @@ export const getTask = async (req: Request, res: Response) => {
       res.status(404).send(new APIResponse(404, null, "Task not found"));
       return;
     }
+
+    addLog("getTask", req.user_id, taskId);
 
     res.status(200).send(new APIResponse(200, [task], "Task retrieved successfully"));
   } catch (error) {
@@ -87,6 +92,8 @@ export const createTask = async (req: Request, res: Response) => {
     });
     await task.save();
 
+    addLog("createTask", userId, task._id.toString());
+
     res.status(201).send(new APIResponse(201, [task], "Task created successfully"));
   } catch (error) {
     res.status(500).send(new APIResponse(500, null, "Internal server error"));
@@ -115,6 +122,8 @@ export const updateTask = async (req: Request, res: Response) => {
       return;
     }
 
+    addLog("updateTask", req.user_id, taskId);
+
     res.status(200).send(new APIResponse(200, [task], "Task updated successfully"));
   } catch (error) {
     res.status(500).send(new APIResponse(500, null, "Internal server error"));
@@ -135,6 +144,8 @@ export const deleteTask = async (req: Request, res: Response) => {
       res.status(404).send(new APIResponse(404, null, "Task not found"));
       return;
     }
+
+    addLog("deleteTask", req.user_id, taskId);
 
     res.status(200).send(new APIResponse(200, null, "Task deleted successfully"));
   } catch (error) {
@@ -162,6 +173,8 @@ export const assignTask = async (req: Request, res: Response) => {
       res.status(404).send(new APIResponse(404, null, "Task not found"));
       return;
     }
+
+    addLog("assignTask", req.user_id, taskId);
 
     res.status(200).send(new APIResponse(200, [task], "Task assigned successfully"));
   } catch (error) {

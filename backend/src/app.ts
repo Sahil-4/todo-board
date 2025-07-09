@@ -7,6 +7,7 @@ import rateLimiter, { rateLimiterOptions } from "./middlewares/rateLimiter.js";
 import { APIResponse } from "./utils/APIResponse.js";
 import authRouter from "./routes/auth.routes.js";
 import tasksRouter from "./routes/tasks.routes.js";
+import logsRouter from "./routes/logs.routes.js";
 
 config();
 
@@ -26,5 +27,6 @@ app.get("/", (_, res: Response) => {
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/tasks", tasksRouter);
+app.use("/api/v1/logs", logsRouter);
 
 export default app;
