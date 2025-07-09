@@ -7,8 +7,11 @@ import {
   deleteTask,
   assignTask,
 } from "../controllers/tasks.controller.js";
+import { verifyAccessTokenHttp } from "../middlewares/authenticate.js";
 
 const router = Router();
+
+router.use(verifyAccessTokenHttp);
 
 router.get("/", getAllTasks);
 
