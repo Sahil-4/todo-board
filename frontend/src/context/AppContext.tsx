@@ -9,7 +9,7 @@ interface AppContextI {
   user: UserI | null;
   setUser: (user: UserI) => void;
   fetchUser: () => void;
-  isAuthenticated: boolean;
+  isAuthenticated: boolean | undefined;
   setIsAuthenticated: (isAuthenticated: boolean) => void;
   logout: () => void;
   login: (credentials: AuthCredentials) => Promise<void>;
@@ -32,7 +32,7 @@ export const AppProvider = (props: PropsWithChildren) => {
   const [error, setError] = useState<any>(null);
 
   const [user, setUser] = useState<UserI | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | undefined>(undefined);
 
   const [tasks, setTasks] = useState<TaskI[]>([]);
 
@@ -61,8 +61,9 @@ export const AppProvider = (props: PropsWithChildren) => {
     try {
       setIsLoading(true);
       const response = await API.login(credentials);
-      localStorage.setItem("user", JSON.stringify(response.data));
-      setUser(response.data);
+      const user = response.data.data;
+      localStorage.setItem("user", JSON.stringify(user));
+      setUser(user);
       setIsAuthenticated(true);
       fetchTasks();
     } catch (err) {
@@ -76,8 +77,9 @@ export const AppProvider = (props: PropsWithChildren) => {
     try {
       setIsLoading(true);
       const response = await API.register(credentials);
-      localStorage.setItem("user", JSON.stringify(response.data));
-      setUser(response.data);
+      const user = response.data.data;
+      localStorage.setItem("user", JSON.stringify(user));
+      setUser(user);
       setIsAuthenticated(true);
       fetchTasks();
     } catch (err) {
@@ -91,7 +93,7 @@ export const AppProvider = (props: PropsWithChildren) => {
     try {
       setIsLoading(true);
       const response = await API.addTask(task);
-      setTasks((prevTasks) => [...prevTasks, response.data]);
+      setTasks((prevTasks) => [...prevTasks, response.data.data]);
       setError(null);
     } catch (err) {
       setError(err);
@@ -104,7 +106,7 @@ export const AppProvider = (props: PropsWithChildren) => {
     try {
       setIsLoading(true);
       const response = await API.updateTask(id, task);
-      const updatedTasks = response.data;
+      const updatedTasks = response.data.data;
       setTasks((prevTasks) => prevTasks.map((t) => (t.id === id ? updatedTasks : t)));
       setError(null);
     } catch (err) {
@@ -131,7 +133,7 @@ export const AppProvider = (props: PropsWithChildren) => {
     try {
       setIsLoading(true);
       const response = await API.fetchTasks();
-      setTasks(response.data);
+      setTasks((prevTasks) => [...prevTasks, ...response.data.data]);
       setError(null);
     } catch (err) {
       setError(err);
