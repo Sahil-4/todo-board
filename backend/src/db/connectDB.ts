@@ -11,7 +11,12 @@ export const connectDB = async () => {
       throw new Error("Invalid MONGO_URI ");
     }
 
-    await mongoose.connect(MONGO_URI);
+    await mongoose.connect(MONGO_URI, {
+      appName: "todoBoard",
+      dbName: "todo-board",
+      retryWrites: true,
+      w: "majority",
+    });
 
     console.log("Database connected successfully");
   } catch (error) {
