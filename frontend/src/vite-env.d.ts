@@ -1,13 +1,13 @@
 /// <reference types="vite/client" />
 
 interface UserI {
-  id: string;
+  _id: string;
   username: string;
   password: string;
 }
 
 interface TaskI {
-  id: string;
+  _id: string;
   title: string;
   description: string;
   status: "todo" | "in-progress" | "done";
@@ -21,7 +21,7 @@ interface TaskI {
 type TaskNew = Pick<TaskI, "title" | "description" | "priority">;
 
 interface LogI {
-  id: string;
+  _id: string;
   action: string;
   user: UserI;
   task?: TodoI;

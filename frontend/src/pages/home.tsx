@@ -1,9 +1,12 @@
 import AuthGuard from "../components/AuthGuard/AuthGuard";
+import Header from "../components/Header/Header";
 
 const Home = () => {
   return (
     <AuthGuard>
-      <div>Home</div>
+      <Header />
+      <main className="container">
+      </main>
     </AuthGuard>
   );
 };

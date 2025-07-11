@@ -23,6 +23,18 @@ interface AppContextI {
   logs: LogI[];
   setLogs: (logs: LogI[]) => void;
   fetchLogs: () => Promise<void>;
+  showLogsModel: boolean;
+  showAddTaskModel: boolean;
+  showEditTaskModel: boolean;
+  showMergeConflictModel: boolean;
+  openLogsModel: () => void;
+  closeLogsModel: () => void;
+  openAddTaskModel: () => void;
+  closeAddTaskModel: () => void;
+  openEditTaskModel: () => void;
+  closeEditTaskModel: () => void;
+  openMergeConflictModel: () => void;
+  closeMergeConflictModel: () => void;
 }
 
 const AppContext = createContext<AppContextI>({} as AppContextI);
@@ -37,6 +49,43 @@ export const AppProvider = (props: PropsWithChildren) => {
   const [tasks, setTasks] = useState<TaskI[]>([]);
 
   const [logs, setLogs] = useState<LogI[]>([]);
+
+  const [showLogsModel, setShowLogsModel] = useState(false);
+  const [showAddTaskModel, setShowAddTaskModel] = useState(false);
+  const [showEditTaskModel, setShowEditTaskModel] = useState(false);
+  const [showMergeConflictModel, setShowMergeConflictModel] = useState(false);
+
+  const openLogsModel = () => {
+    setShowLogsModel(true);
+  };
+
+  const closeLogsModel = () => {
+    setShowLogsModel(false);
+  };
+
+  const openAddTaskModel = () => {
+    setShowAddTaskModel(true);
+  };
+
+  const closeAddTaskModel = () => {
+    setShowAddTaskModel(false);
+  };
+
+  const openEditTaskModel = () => {
+    setShowEditTaskModel(true);
+  };
+
+  const closeEditTaskModel = () => {
+    setShowEditTaskModel(false);
+  };
+
+  const openMergeConflictModel = () => {
+    setShowMergeConflictModel(true);
+  };
+
+  const closeMergeConflictModel = () => {
+    setShowMergeConflictModel(false);
+  };
 
   const fetchUser = () => {
     const user = localStorage.getItem("user");
@@ -107,7 +156,7 @@ export const AppProvider = (props: PropsWithChildren) => {
       setIsLoading(true);
       const response = await API.updateTask(id, task);
       const updatedTasks = response.data.data;
-      setTasks((prevTasks) => prevTasks.map((t) => (t.id === id ? updatedTasks : t)));
+      setTasks((prevTasks) => prevTasks.map((t) => (t._id === id ? updatedTasks : t)));
       setError(null);
     } catch (err) {
       setError(err);
@@ -120,7 +169,7 @@ export const AppProvider = (props: PropsWithChildren) => {
     try {
       setIsLoading(true);
       API.deleteTask(id);
-      setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
+      setTasks((prevTasks) => prevTasks.filter((task) => task._id !== id));
       setError(null);
     } catch (err) {
       setError(err);
@@ -144,7 +193,7 @@ export const AppProvider = (props: PropsWithChildren) => {
     try {
       setIsLoading(true);
       const response = await API.fetchLogs();
-      setLogs(response.data);
+      setLogs(response.data.data);
       setError(null);
     } catch (err) {
       setError(err);
@@ -175,6 +224,18 @@ export const AppProvider = (props: PropsWithChildren) => {
     logs,
     setLogs,
     fetchLogs,
+    showLogsModel,
+    showAddTaskModel,
+    showEditTaskModel,
+    showMergeConflictModel,
+    openLogsModel,
+    closeLogsModel,
+    openAddTaskModel,
+    closeAddTaskModel,
+    openEditTaskModel,
+    closeEditTaskModel,
+    openMergeConflictModel,
+    closeMergeConflictModel,
   };
 
   return <AppContext.Provider value={value}>{props.children}</AppContext.Provider>;
