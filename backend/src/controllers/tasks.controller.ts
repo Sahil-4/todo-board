@@ -52,7 +52,7 @@ export const getTask = async (req: Request, res: Response) => {
 
     addLog("getTask", req.user_id, taskId);
 
-    res.status(200).send(new APIResponse(200, [task], "Task retrieved successfully"));
+    res.status(200).send(new APIResponse(200, task, "Task retrieved successfully"));
   } catch (error) {
     console.error("Error retrieving task:", error);
     res.status(500).send(new APIResponse(500, null, "Internal server error"));
@@ -94,7 +94,7 @@ export const createTask = async (req: Request, res: Response) => {
 
     addLog("createTask", userId, task._id.toString());
 
-    res.status(201).send(new APIResponse(201, [task], "Task created successfully"));
+    res.status(201).send(new APIResponse(201, task, "Task created successfully"));
   } catch (error) {
     res.status(500).send(new APIResponse(500, null, "Internal server error"));
   }
@@ -124,7 +124,7 @@ export const updateTask = async (req: Request, res: Response) => {
 
     addLog("updateTask", req.user_id, taskId);
 
-    res.status(200).send(new APIResponse(200, [task], "Task updated successfully"));
+    res.status(200).send(new APIResponse(200, task, "Task updated successfully"));
   } catch (error) {
     res.status(500).send(new APIResponse(500, null, "Internal server error"));
   }
@@ -176,7 +176,7 @@ export const assignTask = async (req: Request, res: Response) => {
 
     addLog("assignTask", req.user_id, taskId);
 
-    res.status(200).send(new APIResponse(200, [task], "Task assigned successfully"));
+    res.status(200).send(new APIResponse(200, task, "Task assigned successfully"));
   } catch (error) {
     res.status(500).send(new APIResponse(500, null, "Internal server error"));
   }
