@@ -2,7 +2,13 @@ import { useAppContext } from "../../context/useAppContext";
 import "./ViewTaskModal.css";
 
 const ViewTaskModal = () => {
-  const { showViewTaskModel, closeViewTaskModel, selectedTask } = useAppContext();
+  const { showViewTaskModel, closeViewTaskModel, selectedTask, openUpdateTaskModel } =
+    useAppContext();
+
+  const handleTaskClick = () => {
+    closeViewTaskModel();
+    openUpdateTaskModel(selectedTask!);
+  };
 
   if (!showViewTaskModel || !selectedTask) return null;
 
@@ -26,7 +32,7 @@ const ViewTaskModal = () => {
 
         <div className="task-description">
           <h4>Description</h4>
-          <p>{selectedTask.description}</p>
+          <p onClick={handleTaskClick}>{selectedTask.description}</p>
         </div>
       </div>
     </div>

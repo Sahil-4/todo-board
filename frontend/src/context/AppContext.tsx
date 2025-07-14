@@ -28,15 +28,15 @@ interface AppContextI {
   fetchLogs: () => Promise<void>;
   showLogsModel: boolean;
   showAddTaskModel: boolean;
-  showEditTaskModel: boolean;
+  showUpdateTaskModel: boolean;
   showMergeConflictModel: boolean;
   showViewTaskModel: boolean;
   openLogsModel: () => void;
   closeLogsModel: () => void;
   openAddTaskModel: () => void;
   closeAddTaskModel: () => void;
-  openEditTaskModel: () => void;
-  closeEditTaskModel: () => void;
+  openUpdateTaskModel: (task: TaskI) => void;
+  closeUpdateTaskModel: () => void;
   openMergeConflictModel: () => void;
   closeMergeConflictModel: () => void;
   openViewTaskModel: (task: TaskI) => void;
@@ -64,7 +64,7 @@ export const AppProvider = (props: PropsWithChildren) => {
 
   const [showLogsModel, setShowLogsModel] = useState(false);
   const [showAddTaskModel, setShowAddTaskModel] = useState(false);
-  const [showEditTaskModel, setShowEditTaskModel] = useState(false);
+  const [showUpdateTaskModel, setShowUpdateTaskModel] = useState(false);
   const [showMergeConflictModel, setShowMergeConflictModel] = useState(false);
   const [showViewTaskModel, setShowViewTaskModel] = useState(false);
 
@@ -84,12 +84,14 @@ export const AppProvider = (props: PropsWithChildren) => {
     setShowAddTaskModel(false);
   };
 
-  const openEditTaskModel = () => {
-    setShowEditTaskModel(true);
+  const openUpdateTaskModel = (task: TaskI) => {
+    setSelectedTask(task);
+    setShowUpdateTaskModel(true);
   };
 
-  const closeEditTaskModel = () => {
-    setShowEditTaskModel(false);
+  
+  const closeUpdateTaskModel = () => {
+    setShowUpdateTaskModel(false);
   };
 
   const openMergeConflictModel = () => {
@@ -107,7 +109,7 @@ export const AppProvider = (props: PropsWithChildren) => {
 
   const closeViewTaskModel = () => {
     setShowViewTaskModel(false);
-    setSelectedTask(null);
+    // setSelectedTask(null);
   };
 
   const fetchUser = () => {
@@ -295,15 +297,15 @@ export const AppProvider = (props: PropsWithChildren) => {
     fetchLogs,
     showLogsModel,
     showAddTaskModel,
-    showEditTaskModel,
+    showUpdateTaskModel,
     showMergeConflictModel,
     showViewTaskModel,
     openLogsModel,
     closeLogsModel,
     openAddTaskModel,
     closeAddTaskModel,
-    openEditTaskModel,
-    closeEditTaskModel,
+    openUpdateTaskModel,
+    closeUpdateTaskModel,
     openMergeConflictModel,
     closeMergeConflictModel,
     openViewTaskModel,
