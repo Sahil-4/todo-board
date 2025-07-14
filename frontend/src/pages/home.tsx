@@ -3,6 +3,7 @@ import Header from "../components/Header/Header";
 import KanbanBoard from "../components/KanbanBoard/KanbanBoard";
 import AddTaskModal from "../components/AddTaskModal/AddTaskModal";
 import ActivityLogModal from "../components/ActivityLogModal/ActivityLogModal";
+import ViewTaskModal from "../components/ViewTaskModal/ViewTaskModal";
 
 const Home = () => {
   return (
@@ -12,6 +13,7 @@ const Home = () => {
         <KanbanBoard />
         <AddTaskModal />
         <ActivityLogModal />
+        <ViewTaskModal />
       </main>
     </AuthGuard>
   );

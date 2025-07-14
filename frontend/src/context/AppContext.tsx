@@ -15,6 +15,7 @@ interface AppContextI {
   login: (credentials: AuthCredentials) => Promise<void>;
   register: (credentials: AuthCredentials) => Promise<void>;
   tasks: TaskI[];
+  selectedTask: TaskI | null;
   groupedTasks: ColumnT[];
   setTasks: (tasks: TaskI[]) => void;
   addTask: (task: TaskNew) => Promise<void>;
@@ -29,6 +30,7 @@ interface AppContextI {
   showAddTaskModel: boolean;
   showEditTaskModel: boolean;
   showMergeConflictModel: boolean;
+  showViewTaskModel: boolean;
   openLogsModel: () => void;
   closeLogsModel: () => void;
   openAddTaskModel: () => void;
@@ -37,6 +39,8 @@ interface AppContextI {
   closeEditTaskModel: () => void;
   openMergeConflictModel: () => void;
   closeMergeConflictModel: () => void;
+  openViewTaskModel: (task: TaskI) => void;
+  closeViewTaskModel: () => void;
 }
 
 const AppContext = createContext<AppContextI>({} as AppContextI);
@@ -49,6 +53,7 @@ export const AppProvider = (props: PropsWithChildren) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | undefined>(undefined);
 
   const [tasks, setTasks] = useState<TaskI[]>([]);
+  const [selectedTask, setSelectedTask] = useState<TaskI | null>(null);
   const [groupedTasks, setGroupedTasks] = useState<ColumnT[]>([
     { key: "todo", label: "Todo", tasks: [] },
     { key: "in-progress", label: "In progress", tasks: [] },
@@ -61,6 +66,7 @@ export const AppProvider = (props: PropsWithChildren) => {
   const [showAddTaskModel, setShowAddTaskModel] = useState(false);
   const [showEditTaskModel, setShowEditTaskModel] = useState(false);
   const [showMergeConflictModel, setShowMergeConflictModel] = useState(false);
+  const [showViewTaskModel, setShowViewTaskModel] = useState(false);
 
   const openLogsModel = () => {
     setShowLogsModel(true);
@@ -92,6 +98,16 @@ export const AppProvider = (props: PropsWithChildren) => {
 
   const closeMergeConflictModel = () => {
     setShowMergeConflictModel(false);
+  };
+
+  const openViewTaskModel = (task: TaskI) => {
+    setSelectedTask(task);
+    setShowViewTaskModel(true);
+  };
+
+  const closeViewTaskModel = () => {
+    setShowViewTaskModel(false);
+    setSelectedTask(null);
   };
 
   const fetchUser = () => {
@@ -266,6 +282,7 @@ export const AppProvider = (props: PropsWithChildren) => {
     login,
     register,
     tasks,
+    selectedTask,
     groupedTasks,
     setTasks,
     addTask,
@@ -280,6 +297,7 @@ export const AppProvider = (props: PropsWithChildren) => {
     showAddTaskModel,
     showEditTaskModel,
     showMergeConflictModel,
+    showViewTaskModel,
     openLogsModel,
     closeLogsModel,
     openAddTaskModel,
@@ -288,6 +306,8 @@ export const AppProvider = (props: PropsWithChildren) => {
     closeEditTaskModel,
     openMergeConflictModel,
     closeMergeConflictModel,
+    openViewTaskModel,
+    closeViewTaskModel,
   };
 
   return <AppContext.Provider value={value}>{props.children}</AppContext.Provider>;
