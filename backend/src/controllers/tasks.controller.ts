@@ -110,12 +110,18 @@ export const updateTask = async (req: Request, res: Response) => {
       return;
     }
 
-    const task = await Task.findByIdAndUpdate(taskId, {
-      title,
-      description,
-      priority,
-      status,
-    });
+    const task = await Task.findByIdAndUpdate(
+      taskId,
+      {
+        title,
+        description,
+        priority,
+        status,
+      },
+      {
+        new: true,
+      }
+    );
 
     if (!task) {
       res.status(404).send(new APIResponse(404, null, "Task not found"));
