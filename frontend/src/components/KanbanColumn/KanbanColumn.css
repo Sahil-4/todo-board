@@ -1,0 +1,20 @@
+.kanban-column {
+  flex: 1;
+  min-width: 300px;
+  background-color: var(--background);
+  border-radius: 10px;
+  padding: 1rem;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+.column-label {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+  color: var(--text);
+}
+
+.task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}

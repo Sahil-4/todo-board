@@ -1,4 +1,4 @@
-import { createContext, useState, type PropsWithChildren } from "react";
+import { createContext, useEffect, useState, type PropsWithChildren } from "react";
 import * as API from "../api";
 
 interface AppContextI {
@@ -15,9 +15,11 @@ interface AppContextI {
   login: (credentials: AuthCredentials) => Promise<void>;
   register: (credentials: AuthCredentials) => Promise<void>;
   tasks: TaskI[];
+  groupedTasks: ColumnT[];
   setTasks: (tasks: TaskI[]) => void;
   addTask: (task: TaskNew) => Promise<void>;
   updateTask: (id: string, task: TaskI) => Promise<void>;
+  updateTaskStatus: (taskId: string, status: TaskI["status"]) => Promise<void>;
   deleteTask: (id: string) => void;
   fetchTasks: () => Promise<void>;
   logs: LogI[];
@@ -47,6 +49,11 @@ export const AppProvider = (props: PropsWithChildren) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | undefined>(undefined);
 
   const [tasks, setTasks] = useState<TaskI[]>([]);
+  const [groupedTasks, setGroupedTasks] = useState<ColumnT[]>([
+    { key: "todo", label: "Todo", tasks: [] },
+    { key: "in-progress", label: "In progress", tasks: [] },
+    { key: "done", label: "Done", tasks: [] },
+  ]);
 
   const [logs, setLogs] = useState<LogI[]>([]);
 
@@ -165,6 +172,29 @@ export const AppProvider = (props: PropsWithChildren) => {
     }
   };
 
+  const updateTaskStatus = async (taskId: string, status: TaskI["status"]) => {
+    try {
+      setIsLoading(true);
+      let flag = true;
+      const updatedTasks = tasks.map((task) => {
+        if (task._id === taskId) {
+          flag = task.status !== status;
+          task.status = status;
+        }
+        return task;
+      });
+      if (flag) {
+        setTasks(updatedTasks);
+        const task = tasks.find((task) => task._id === taskId);
+        await API.updateTask(taskId, task!);
+      }
+    } catch (err) {
+      setError(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const deleteTask = (id: string) => {
     try {
       setIsLoading(true);
@@ -182,7 +212,7 @@ export const AppProvider = (props: PropsWithChildren) => {
     try {
       setIsLoading(true);
       const response = await API.fetchTasks();
-      setTasks((prevTasks) => [...prevTasks, ...response.data.data]);
+      setTasks(response.data.data);
       setError(null);
     } catch (err) {
       setError(err);
@@ -202,6 +232,26 @@ export const AppProvider = (props: PropsWithChildren) => {
     }
   };
 
+  const updateGroupedTasks = () => {
+    const todo: ColumnT = { key: "todo", label: "Todo", tasks: [] };
+    const progress: ColumnT = { key: "in-progress", label: "In progress", tasks: [] };
+    const done: ColumnT = { key: "done", label: "Done", tasks: [] };
+    tasks.forEach((task: TaskI) => {
+      if (task.status === "todo") {
+        todo.tasks.push(task);
+      } else if (task.status === "in-progress") {
+        progress.tasks.push(task);
+      } else {
+        done.tasks.push(task);
+      }
+    });
+    setGroupedTasks([todo, progress, done]);
+  };
+
+  useEffect(() => {
+    updateGroupedTasks();
+  }, [tasks]);
+
   const value = {
     isLoading,
     setIsLoading,
@@ -216,9 +266,11 @@ export const AppProvider = (props: PropsWithChildren) => {
     login,
     register,
     tasks,
+    groupedTasks,
     setTasks,
     addTask,
     updateTask,
+    updateTaskStatus,
     deleteTask,
     fetchTasks,
     logs,

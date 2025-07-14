@@ -34,3 +34,8 @@ type AuthCredentials = {
   password: string;
 };
 
+type ColumnT = {
+  key: TaskI["status"];
+  label: string;
+  tasks: TaskI[];
+};
