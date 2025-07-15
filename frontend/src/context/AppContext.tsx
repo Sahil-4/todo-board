@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState, type PropsWithChildren } from "react";
+import { createContext, useEffect, useRef, useState, type PropsWithChildren } from "react";
 import * as API from "../api";
 
 interface AppContextI {
@@ -41,6 +41,8 @@ interface AppContextI {
   closeMergeConflictModel: () => void;
   openViewTaskModel: (task: TaskI) => void;
   closeViewTaskModel: () => void;
+  openErrorModal: (message: string, onClose: () => void) => void;
+  closeErrorModal: () => void;
 }
 
 const AppContext = createContext<AppContextI>({} as AppContextI);
@@ -48,6 +50,7 @@ const AppContext = createContext<AppContextI>({} as AppContextI);
 export const AppProvider = (props: PropsWithChildren) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<any>(null);
+  const errorOnClose = useRef<Function | null>(null);
 
   const [user, setUser] = useState<UserI | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | undefined>(undefined);
@@ -89,7 +92,7 @@ export const AppProvider = (props: PropsWithChildren) => {
     setShowUpdateTaskModel(true);
   };
 
-  
+
   const closeUpdateTaskModel = () => {
     setShowUpdateTaskModel(false);
   };
@@ -110,6 +113,16 @@ export const AppProvider = (props: PropsWithChildren) => {
   const closeViewTaskModel = () => {
     setShowViewTaskModel(false);
     // setSelectedTask(null);
+  };
+
+  const openErrorModal = (message: string, onClose?: () => void) => {
+    setError(message);
+    errorOnClose.current = onClose || null;
+  };
+
+  const closeErrorModal = () => {
+    setError(null);
+    if (errorOnClose.current) errorOnClose.current();
   };
 
   const fetchUser = () => {
@@ -140,8 +153,8 @@ export const AppProvider = (props: PropsWithChildren) => {
       setUser(user);
       setIsAuthenticated(true);
       fetchTasks();
-    } catch (err) {
-      setError(err);
+    } catch (err: any) {
+      openErrorModal(err.response?.data.message || err.message);
     } finally {
       setIsLoading(false);
     }
@@ -156,8 +169,8 @@ export const AppProvider = (props: PropsWithChildren) => {
       setUser(user);
       setIsAuthenticated(true);
       fetchTasks();
-    } catch (err) {
-      setError(err);
+    } catch (err: any) {
+      openErrorModal(err.response?.data.message || err.message);
     } finally {
       setIsLoading(false);
     }
@@ -168,9 +181,8 @@ export const AppProvider = (props: PropsWithChildren) => {
       setIsLoading(true);
       const response = await API.addTask(task);
       setTasks((prevTasks) => [...prevTasks, response.data.data]);
-      setError(null);
-    } catch (err) {
-      setError(err);
+    } catch (err: any) {
+      openErrorModal(err.response?.data.message || err.message);
     } finally {
       setIsLoading(false);
     }
@@ -182,9 +194,8 @@ export const AppProvider = (props: PropsWithChildren) => {
       const response = await API.updateTask(id, task);
       const updatedTasks = response.data.data;
       setTasks((prevTasks) => prevTasks.map((t) => (t._id === id ? updatedTasks : t)));
-      setError(null);
-    } catch (err) {
-      setError(err);
+    } catch (err: any) {
+      openErrorModal(err.response?.data.message || err.message);
     } finally {
       setIsLoading(false);
     }
@@ -206,8 +217,8 @@ export const AppProvider = (props: PropsWithChildren) => {
         const task = tasks.find((task) => task._id === taskId);
         await API.updateTask(taskId, task!);
       }
-    } catch (err) {
-      setError(err);
+    } catch (err: any) {
+      openErrorModal(err.response?.data.message || err.message);
     } finally {
       setIsLoading(false);
     }
@@ -218,9 +229,8 @@ export const AppProvider = (props: PropsWithChildren) => {
       setIsLoading(true);
       API.deleteTask(id);
       setTasks((prevTasks) => prevTasks.filter((task) => task._id !== id));
-      setError(null);
-    } catch (err) {
-      setError(err);
+    } catch (err: any) {
+      openErrorModal(err.response?.data.message || err.message);
     } finally {
       setIsLoading(false);
     }
@@ -231,9 +241,8 @@ export const AppProvider = (props: PropsWithChildren) => {
       setIsLoading(true);
       const response = await API.fetchTasks();
       setTasks(response.data.data);
-      setError(null);
-    } catch (err) {
-      setError(err);
+    } catch (err: any) {
+      openErrorModal(err.response?.data.message || err.message);
     }
   };
 
@@ -242,9 +251,8 @@ export const AppProvider = (props: PropsWithChildren) => {
       setIsLoading(true);
       const response = await API.fetchLogs();
       setLogs(response.data.data);
-      setError(null);
-    } catch (err) {
-      setError(err);
+    } catch (err: any) {
+      openErrorModal(err.response?.data.message || err.message);
     } finally {
       setIsLoading(false);
     }
@@ -310,6 +318,8 @@ export const AppProvider = (props: PropsWithChildren) => {
     closeMergeConflictModel,
     openViewTaskModel,
     closeViewTaskModel,
+    openErrorModal,
+    closeErrorModal,
   };
 
   return <AppContext.Provider value={value}>{props.children}</AppContext.Provider>;
