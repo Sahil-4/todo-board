@@ -47,6 +47,8 @@
 }
 
 .task-desc {
+  max-height: 240px;
+  overflow: hidden;
   font-size: 0.9rem;
   color: var(--text);
   cursor: pointer;

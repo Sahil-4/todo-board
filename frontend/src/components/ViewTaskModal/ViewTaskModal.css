@@ -90,6 +90,8 @@
 }
 
 .task-description p {
+  max-height: 420px;
+  overflow: hidden scroll;
   font-size: 0.95rem;
   line-height: 1.5;
   color: var(--text);
