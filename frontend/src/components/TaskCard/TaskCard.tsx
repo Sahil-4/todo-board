@@ -35,9 +35,11 @@ const TaskCard = ({ task }: Props) => {
         {task.assignedTo?.username ?? "Unassigned"} &bull; {task.priority}
       </p>
       <p className="task-date">{new Date(task.updatedAt).toLocaleString()}</p>
-      <p className="task-desc" onClick={handleTaskClick}>
-        {task.description}
-      </p>
+      <div className="task-desc" onClick={handleTaskClick}>
+        {task.description.split("\n").map((segment) => (
+          <div>{segment}</div>
+        ))}
+      </div>
     </div>
   );
 };

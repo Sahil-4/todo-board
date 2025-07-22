@@ -32,7 +32,11 @@ const ViewTaskModal = () => {
 
         <div className="task-description">
           <h4>Description</h4>
-          <p onClick={handleTaskClick}>{selectedTask.description}</p>
+          <div onClick={handleTaskClick}>
+            {selectedTask.description.split("\n").map((segment) => (
+              <div>{segment}</div>
+            ))}
+          </div>
         </div>
       </div>
     </div>

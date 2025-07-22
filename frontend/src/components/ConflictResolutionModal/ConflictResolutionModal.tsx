@@ -60,7 +60,11 @@ const ConflictResolutionModal = () => {
             </div>
             <div className="task-description">
               <h4>Description</h4>
-              <p>{taskClient.description}</p>
+              <p>
+                {task.description.split("\n").map((segment) => (
+                  <div>{segment}</div>
+                ))}
+              </p>
             </div>
           </div>
 
