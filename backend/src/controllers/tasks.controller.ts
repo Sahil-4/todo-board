@@ -103,10 +103,24 @@ export const createTask = async (req: Request, res: Response) => {
 export const updateTask = async (req: Request, res: Response) => {
   try {
     const taskId = req.params.id;
-    const { title, description, priority, status } = req.body;
+    const { title, description, priority, status, updatedAt } = req.body;
 
     if (!taskId || !mongoose.Types.ObjectId.isValid(taskId)) {
       res.status(400).send(new APIResponse(400, null, "Invalid Task ID"));
+      return;
+    }
+
+    const taskServer = await Task.findById(taskId);
+
+    if (!taskServer) {
+      res.status(404).send(new APIResponse(404, null, "Task not found"));
+      return;
+    }
+
+    const isConflict = new Date(taskServer.updatedAt) > new Date(updatedAt);
+    if (isConflict) {
+      const taskClient = { ...taskServer?.toJSON(), title, description, priority, status };
+      res.status(409).send(new APIResponse(409, [taskServer, taskClient], "Conflict arise"));
       return;
     }
 
@@ -122,11 +136,6 @@ export const updateTask = async (req: Request, res: Response) => {
         new: true,
       }
     );
-
-    if (!task) {
-      res.status(404).send(new APIResponse(404, null, "Task not found"));
-      return;
-    }
 
     addLog("updateTask", req.user_id, taskId);
 

@@ -15,6 +15,7 @@ interface AppContextI {
   login: (credentials: AuthCredentials) => Promise<void>;
   register: (credentials: AuthCredentials) => Promise<void>;
   tasks: TaskI[];
+  conflictedTask: { taskServer: TaskI | undefined; taskClient: TaskI | undefined };
   selectedTask: TaskI | null;
   groupedTasks: ColumnT[];
   setTasks: (tasks: TaskI[]) => void;
@@ -31,6 +32,7 @@ interface AppContextI {
   showUpdateTaskModel: boolean;
   showMergeConflictModel: boolean;
   showViewTaskModel: boolean;
+  showConflictResolutionModal: boolean;
   openLogsModel: () => void;
   closeLogsModel: () => void;
   openAddTaskModel: () => void;
@@ -43,6 +45,7 @@ interface AppContextI {
   closeViewTaskModel: () => void;
   openErrorModal: (message: string, onClose: () => void) => void;
   closeErrorModal: () => void;
+  closeConflictResolutionModal: () => void;
 }
 
 const AppContext = createContext<AppContextI>({} as AppContextI);
@@ -57,6 +60,10 @@ export const AppProvider = (props: PropsWithChildren) => {
 
   const [tasks, setTasks] = useState<TaskI[]>([]);
   const [selectedTask, setSelectedTask] = useState<TaskI | null>(null);
+  const [conflictedTask, setConflictedTask] = useState<AppContextI["conflictedTask"]>({
+    taskServer: undefined,
+    taskClient: undefined,
+  });
   const [groupedTasks, setGroupedTasks] = useState<ColumnT[]>([
     { key: "todo", label: "Todo", tasks: [] },
     { key: "in-progress", label: "In progress", tasks: [] },
@@ -70,6 +77,7 @@ export const AppProvider = (props: PropsWithChildren) => {
   const [showUpdateTaskModel, setShowUpdateTaskModel] = useState(false);
   const [showMergeConflictModel, setShowMergeConflictModel] = useState(false);
   const [showViewTaskModel, setShowViewTaskModel] = useState(false);
+  const [showConflictResolutionModal, setShowConflictResolutionModal] = useState(false);
 
   const openLogsModel = () => {
     setShowLogsModel(true);
@@ -91,7 +99,6 @@ export const AppProvider = (props: PropsWithChildren) => {
     setSelectedTask(task);
     setShowUpdateTaskModel(true);
   };
-
 
   const closeUpdateTaskModel = () => {
     setShowUpdateTaskModel(false);
@@ -123,6 +130,15 @@ export const AppProvider = (props: PropsWithChildren) => {
   const closeErrorModal = () => {
     setError(null);
     if (errorOnClose.current) errorOnClose.current();
+  };
+
+  const openConflictResolutionModal = (taskServer: TaskI, taskClient: TaskI) => {
+    setConflictedTask({ taskServer, taskClient });
+    setShowConflictResolutionModal(true);
+  };
+
+  const closeConflictResolutionModal = () => {
+    setShowConflictResolutionModal(false);
   };
 
   const fetchUser = () => {
@@ -195,7 +211,12 @@ export const AppProvider = (props: PropsWithChildren) => {
       const updatedTasks = response.data.data;
       setTasks((prevTasks) => prevTasks.map((t) => (t._id === id ? updatedTasks : t)));
     } catch (err: any) {
-      openErrorModal(err.response?.data.message || err.message);
+      let cb = undefined;
+      if (err.response?.data.statusCode === 409) {
+        const [taskServer, taskClient] = err.response.data.data;
+        cb = () => openConflictResolutionModal(taskServer, taskClient);
+      }
+      openErrorModal(err.response?.data.message || err.message, cb);
     } finally {
       setIsLoading(false);
     }
@@ -293,6 +314,7 @@ export const AppProvider = (props: PropsWithChildren) => {
     register,
     tasks,
     selectedTask,
+    conflictedTask,
     groupedTasks,
     setTasks,
     addTask,
@@ -308,6 +330,7 @@ export const AppProvider = (props: PropsWithChildren) => {
     showUpdateTaskModel,
     showMergeConflictModel,
     showViewTaskModel,
+    showConflictResolutionModal,
     openLogsModel,
     closeLogsModel,
     openAddTaskModel,
@@ -320,6 +343,7 @@ export const AppProvider = (props: PropsWithChildren) => {
     closeViewTaskModel,
     openErrorModal,
     closeErrorModal,
+    closeConflictResolutionModal,
   };
 
   return <AppContext.Provider value={value}>{props.children}</AppContext.Provider>;
